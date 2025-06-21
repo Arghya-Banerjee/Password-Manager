@@ -1,63 +1,34 @@
-import json
 import base64
-from pathlib import Path
-from cryptography.fernet import InvalidToken
+import json
+from cryptography.fernet import Fernet, InvalidToken
 
-from password_manager.crypto import derive_key, generate_salt, get_fernet
+def _derive_key(master_password: str) -> bytes:
+    # Simple static key derivation for example purposes.
+    return base64.urlsafe_b64encode(master_password.encode("utf-8").ljust(32, b"0"))
 
-VAULT_PATH = Path.home() / ".vault.dat"
+def init_vault(master_password: str, path):
+    if path.exists():
+        raise FileExistsError("Vault already exists.")
+    key = _derive_key(master_password)
+    fernet = Fernet(key)
+    encrypted = fernet.encrypt(json.dumps({}).encode("utf-8"))
+    with open(path, "wb") as f:
+        f.write(encrypted)
 
-def init_vault(master_password: str):
-    """
-    Create a fresh, empty vault encrypted under master_password.
-    """
-    if VAULT_PATH.exists():
-        raise FileExistsError(f"Vault already exists at {VAULT_PATH}")
-    salt = generate_salt()
-    key = derive_key(master_password, salt)
-    fernet = get_fernet(key)
-
-    empty_blob = json.dumps({}).encode()
-    token = fernet.encrypt(empty_blob).decode()
-
-    data = {
-        "salt": base64.urlsafe_b64encode(salt).decode(),
-        "vault": token
-    }
-    with open(VAULT_PATH, "w") as f:
-        json.dump(data, f)
-
-def load_vault(master_password: str) -> dict:
-    """
-    Decrypt and return the vault as a Python dict.
-    """
-    if not VAULT_PATH.exists():
-        raise FileNotFoundError("Vault not found. Run `init` first.")
-    raw = json.loads(VAULT_PATH.read_text())
-    salt = base64.urlsafe_b64decode(raw["salt"].encode())
-    token = raw["vault"].encode()
-
-    key = derive_key(master_password, salt)
-    fernet = get_fernet(key)
-
+def load_vault(master_password: str, path):
+    key = _derive_key(master_password)
+    fernet = Fernet(key)
+    with open(path, "rb") as f:
+        encrypted = f.read()
     try:
-        decrypted = fernet.decrypt(token)
+        decrypted = fernet.decrypt(encrypted)
     except InvalidToken:
-        raise ValueError("Invalid master password or corrupted vault.")
-    return json.loads(decrypted.decode())
+        raise ValueError("Invalid master password.")
+    return json.loads(decrypted.decode("utf-8"))
 
-def save_vault(master_password: str, vault: dict):
-    """
-    Encrypt the in-memory vault dict and overwrite the on-disk file.
-    """
-    raw = json.loads(VAULT_PATH.read_text())
-    salt = base64.urlsafe_b64decode(raw["salt"].encode())
-
-    key = derive_key(master_password, salt)
-    fernet = get_fernet(key)
-
-    token = fernet.encrypt(json.dumps(vault).encode()).decode()
-    raw["vault"] = token
-
-    with open(VAULT_PATH, "w") as f:
-        json.dump(raw, f)
+def save_vault(master_password: str, data: dict, path):
+    key = _derive_key(master_password)
+    fernet = Fernet(key)
+    encrypted = fernet.encrypt(json.dumps(data).encode("utf-8"))
+    with open(path, "wb") as f:
+        f.write(encrypted)
