@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "password_manager"
+version = "0.1.0"
+dependencies = [
+  "cryptography>=41.0.0",
+  "PySimpleGUI>=4.60.0",
+]
+
+[project.scripts]
+pm-cli = "password_manager.cli:main"
+pm-gui = "password_manager.gui:main"

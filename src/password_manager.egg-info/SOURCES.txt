@@ -1,0 +1,17 @@
+README.md
+pyproject.toml
+src/password_manager/__init__.py
+src/password_manager/cli.py
+src/password_manager/crypto.py
+src/password_manager/gui.py
+src/password_manager/utils.py
+src/password_manager/vault.py
+src/password_manager.egg-info/PKG-INFO
+src/password_manager.egg-info/SOURCES.txt
+src/password_manager.egg-info/dependency_links.txt
+src/password_manager.egg-info/entry_points.txt
+src/password_manager.egg-info/requires.txt
+src/password_manager.egg-info/top_level.txt
+tests/test_crypto.py
+tests/test_utils.py
+tests/test_vault.py

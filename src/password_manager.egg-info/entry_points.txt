@@ -1,0 +1,3 @@
+[console_scripts]
+pm-cli = password_manager.cli:main
+pm-gui = password_manager.gui:main

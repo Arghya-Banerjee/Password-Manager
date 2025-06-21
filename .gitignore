@@ -1,0 +1,46 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Editor config
+.vscode/
+.idea/
+*.swp
+*.sublime-project
+*.sublime-workspace
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Vault file (highly sensitive!)
+.vault.dat
+
+# PyInstaller build folders
+dist/
+build/
+*.spec
+
+# Logs and temp files
+*.log
+*.bak
+*.tmp
+*.old
+
+# Test artifacts
+htmlcov/
+coverage.xml
+.pytest_cache/
+
+# Ignore compiled binary
+password-manager.exe
